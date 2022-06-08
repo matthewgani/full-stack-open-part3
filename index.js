@@ -1,7 +1,24 @@
 // const http = require('http')
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 app.use(express.json())
+// app.use(morgan('tiny'))
+
+
+morgan.token('post', function (req, res) {
+    // console.log(req.method)
+    if (req.method === 'POST') {
+        return JSON.stringify(req.body)
+    }
+    // else {
+    //     console.log(req.method)
+    // }
+})
+    // console.log(typeof(req.body))
+
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post'))
 
 let persons = [
     { 
@@ -25,6 +42,8 @@ let persons = [
       "number": "39-23-6423122"
     }
 ]
+
+
 
 app.get('/api/persons/:id', (request, response) => {
     let id = Number(request.params.id)
@@ -108,3 +127,10 @@ app.get('/info', (request, response) => {
 const PORT = 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
+
+
+// to catch non existent routes, have to be after all routes
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
