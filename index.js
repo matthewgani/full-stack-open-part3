@@ -1,6 +1,8 @@
 const http = require('http')
 const express = require('express')
+const { response } = require('express')
 const app = express()
+app.use(express.json())
 
 let persons = [
     { 
@@ -27,6 +29,12 @@ let persons = [
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
+})
+
+app.get('/info', (request, response) => {
+    let responseString = `<p>Phonebook has info for ${persons.length} people </p>` 
+        + `<p>${new Date()}</p>`
+    response.send(responseString)
 })
 
 const PORT = 3001
