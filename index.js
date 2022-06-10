@@ -14,7 +14,7 @@ app.use(cors())
 
 
 morgan.token('post', function (req, res) {
-    if (req.method === 'POST') {
+    if (req.method === 'POST' && res.statusCode < 400) {
         return JSON.stringify(req.body)
     }
     // can also check if error code is 400, return the error/json
@@ -80,6 +80,8 @@ app.post('/api/persons', (request, response, next) => {
             person.save().then(savedPerson => {
                 // only return json as response once the person is saved into db
                 response.json(savedPerson)
+            }).catch((error) => {
+                next(error)
             })
         }
         else {
@@ -113,7 +115,8 @@ app.put('/api/persons/:id', (request, response, next) => {
     const person = {
         number: body.number
     }
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, 
+        { new: true, runValidators: true, context:'query' })
       .then(updatedPerson => {
         response.json(updatedPerson)
       })
@@ -146,12 +149,14 @@ app.use(unknownEndpoint)
 
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
-  
+    //console.error(error.message)
+    console.log(error.name)
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
-    } 
-    
+    } else if (error.name === 'ValidationError') {
+        //console.log('val error')
+        return response.status(400).json({errorMessage: error.message, errorName: error.name})
+    }
     // goes to default express error handler
     next(error)
 }
