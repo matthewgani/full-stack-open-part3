@@ -24,21 +24,21 @@ mongoose
     console.log('connected')
 
     const newPerson = new Person({
-        name: process.argv[3],
-        number: process.argv[4]
+      name: process.argv[3],
+      number: process.argv[4]
     })
 
     return newPerson.save()
   })
   .then(() => {
-      console.log('contact saved!')
-      console.log('printing all phonebook contacts')
-      Person.find({}).then(result => {
-          result.forEach(person => {
-              console.log(person)
-            })
-            mongoose.connection.close()
-        })
-        return 
+    console.log('contact saved!')
+    console.log('printing all phonebook contacts')
+    Person.find({}).then(result => {
+      result.forEach(person => {
+        console.log(person)
+      })
+      mongoose.connection.close()
+    })
+    return
   })
   .catch((err) => console.log(err))
