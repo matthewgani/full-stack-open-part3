@@ -118,8 +118,11 @@ app.get('/api/persons', (request, response) => {
     // we configure the personSchema in person.js
     // to return from Person model the object we want (without _id and _v)
     // to here
+    console.log('ee')
     Person.find({}).then(persons => {
         response.json(persons)
+    }).catch((error) => {
+        console.log('error finding from MongoDB:', error.message)
     })
 })
 
