@@ -23,9 +23,9 @@ const personSchema = new mongoose.Schema({
     minLength: 8,
     validate: {
       validator: function(num) {
-        return /\d{2,3}-\d+/.test(num)
+        return /^\d{2,3}-?\d+$/.test(num)
       },
-      message: 'A valid number has the format: <2 or 3 digits><-><any amount of digits> ex: 23-1000000'
+      message: 'A valid number has the format: <2 or 3 digits><-><any amount of digits> or no dash. EX: 23-1000000 or 12345678'
 
     },
     required: true
