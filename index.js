@@ -27,7 +27,7 @@ app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
     .then(person => {
       if (person) {
-        response.json(note)
+        response.json(person)
       } else {
         response.status(404).end()
       }
@@ -50,33 +50,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
     // response.status(204).end()
 })
 
-// NEED TO REWORK
-const checkForDuplicateName = (name) => {
-
-    // const person = persons.find(person => person.name === name)
-    // if (person === undefined) {
-    //     return false
-    // }
-    // else {
-    //     return true
-    // }
-    let res = false
-    Person.find({}).then(persons => {
-        
-        persons.forEach((person)=> {
-            // console.log(person)
-            if (person.name === name) {
-                console.log('dup')
-                res = true
-            }
-        })
-        console.log('res', res)
-        return res
-    }).catch((error) => {
-        next(error)
-        return false
-    })
-}
 // add the new person and return the json object created
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
@@ -138,7 +111,6 @@ app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
     
     const person = {
-        name: body.name,
         number: body.number
     }
     Person.findByIdAndUpdate(request.params.id, person, { new: true })
@@ -148,11 +120,16 @@ app.put('/api/persons/:id', (request, response, next) => {
       .catch(error => next(error))
   })
 
-// app.get('/info', (request, response) => {
-//     let responseString = `<p>Phonebook has info for ${persons.length} people </p>` 
-//         + `<p>${new Date()}</p>`
-//     response.send(responseString)
-// })
+app.get('/info', (request, response) => {
+
+    Person.find({}).then(persons => {
+        let responseString = `<p>Phonebook has info for ${persons.length} people </p>` 
+        + `<p>${new Date()}</p>`
+        response.send(responseString)
+    }).catch((error) => {
+        next(error)
+    })
+})
 
 const PORT = process.env.PORT
 app.listen(PORT)
