@@ -63,6 +63,7 @@ app.post('/api/persons', (request, response, next) => {
 
     // in the front end, we already check for dups
     // but if we use POSTMAN, it does not go through the front end
+    // this denies if there is a POST and name already exists
     Person.find({}).then(persons => {
         let res = false
         persons.forEach((person)=> {
