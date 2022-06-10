@@ -1,4 +1,7 @@
 // const http = require('http')
+require('dotenv').config()
+const Person = require('./models/person')
+
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
@@ -6,7 +9,6 @@ const cors = require('cors')
 
 app.use(express.static('build'))
 app.use(express.json())
-// app.use(morgan('tiny'))
 app.use(cors())
 
 
@@ -14,9 +16,6 @@ morgan.token('post', function (req, res) {
     if (req.method === 'POST') {
         return JSON.stringify(req.body)
     }
-    // else {
-    //     console.log(req.method)
-    // }
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post'))
@@ -103,20 +102,25 @@ app.post('/api/persons', (request, response) => {
             error: 'name must be unique'
         })
     }
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    person.save().then(savedPerson => {
+        // only return json as response once the person is saved into db
+        response.json(savedPerson)
+    })
 
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    // we configure the personSchema in person.js
+    // to return from Person model the object we want (without _id and _v)
+    // to here
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/info', (request, response) => {
@@ -125,7 +129,7 @@ app.get('/info', (request, response) => {
     response.send(responseString)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
 
